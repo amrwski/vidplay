@@ -1,10 +1,11 @@
 import React from "react"
 import SearchBar from "./SearchBar"
 import VideoList from "./VideoList"
+import VideoDetail from "./VideoDetail"
 import { yt } from "../api/yt"
 
 class App extends React.Component {
-  state = { vids: [], selectedVideo: "" }
+  state = { vids: [], selectedVideo: null }
 
   onSearchSubmit = async (term) => {
     const response = await yt.get("/search", {
@@ -17,14 +18,16 @@ class App extends React.Component {
       },
     })
     this.setState({ vids: response.data.items })
-    console.log(this.state.vids)
   }
 
-  onVideoSelect = () => {}
+  onVideoSelect = (video) => {
+    this.setState({ selectedVideo: video })
+    // console.log("from the App", this.state.selectedVideo)
+  }
 
   numberOfVids = () => {
     return this.state.vids.length === 0 ? (
-      true
+      <div></div>
     ) : (
       <label className="ui label">I found {this.state.vids.length} videos</label>
     )
@@ -34,8 +37,9 @@ class App extends React.Component {
     return (
       <div className="ui container" style={{ marginTop: "20px" }}>
         <SearchBar onSearchSubmit={this.onSearchSubmit} />
+        <VideoDetail video={this.state.selectedVideo} />
         {this.numberOfVids()}
-        <VideoList vids={this.state.vids} />
+        <VideoList vids={this.state.vids} onVideoSelect={this.onVideoSelect} />
       </div>
     )
   }
